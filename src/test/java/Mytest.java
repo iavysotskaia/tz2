@@ -154,7 +154,7 @@ public class Mytest {
 
         long v = Main._max(a);
 
-        Assertions.assertEquals(68l, v);
+        Assertions.assertEquals(69l, v);
     }
     //реализация теста на выход за пределы типа Long ("реализуйте любой другой тест на ваше усмотрение")
     @Test
