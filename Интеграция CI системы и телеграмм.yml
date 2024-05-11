@@ -1,0 +1,49 @@
+name: Java
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check
+        uses: actions/checkout@v1
+      - name: Set up JDK 20
+        uses: actions/setup-java@v2
+        with:
+          java-version: '20'
+          distribution: 'adopt'
+      - name: Build
+        run: mvn --batch-mode -DskipTests package
+      - name: Test
+        run: mvn --batch-mode test
+      - name: Telegram notify
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            Build Failed
+            *Repository*: ${{ github.repository }}
+            *Actor*: ${{ github.actor }}
+            *Commit*: ${{ github.sha }}
+            *Message*: ${{ github.event.head_commit.message }}
+            [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+      - name: Notify Telegram on success
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            "все ок"
+            *Repository*: ${{ github.repository }}
+            *Actor*: ${{ github.actor }}
+            *Commit*: ${{ github.sha }}
+            *Message*: ${{ github.event.head_commit.message }}
+            [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
